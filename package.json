@@ -1,0 +1,30 @@
+{
+  "name": "streamverse",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "clsx": "latest",
+    "dotenv": "^17.3.1",
+    "firebase": "^12.9.0",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-router-dom": "latest",
+    "tailwind-merge": "latest"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "latest",
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "vite": "latest"
+  }
+}

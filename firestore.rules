@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── HELPERS ────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ─── CONTENT ─────────────────────────────────────────────
+    // Anyone can read content. Only Cloud Functions / admin SDK can write.
+    match /content/{contentId} {
+      allow read: if true;
+      // Allow authenticated users to increment viewCount, likeCount, popularity
+      // (These are the only fields updated by client writes)
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['viewCount', 'likeCount', 'popularity']);
+      allow create, delete: if false;
+    }
+
+    // ─── USERS ───────────────────────────────────────────────
+    // Users can only read/write their own profile doc
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // ─── LIKES ───────────────────────────────────────────────
+    // Like doc ID is always "{uid}_{contentId}"
+    // User can only create/delete their own likes
+    match /likes/{likeId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn()
+        && resource.data.userId == request.auth.uid;
+      allow update: if false;
+    }
+
+    // ─── WATCH HISTORY ────────────────────────────────────────
+    // History doc ID is always "{uid}_{contentId}"
+    // Users can only read/write their own history
+    match /watchHistory/{historyId} {
+      allow read, write: if isSignedIn() 
+        && (resource == null ? request.resource.data.userId == request.auth.uid : resource.data.userId == request.auth.uid);
+    }
+
+    // ─── MY LIST ──────────────────────────────────────────────
+    // List doc ID is "{uid}_{contentId}"
+    match /myList/{listId} {
+      allow read, write: if isSignedIn()
+        && (resource == null ? request.resource.data.userId == request.auth.uid : resource.data.userId == request.auth.uid);
+    }
+  }
+}

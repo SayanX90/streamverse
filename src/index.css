@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    /* Deep space black instead of flat black */
+    @apply bg-[#050505] text-[#FAFAFA] overflow-x-hidden selection:bg-white/20 selection:text-white;
+  }
+}
+
+@layer utilities {
+  .glass-nav {
+    /* Very subtle glass for the nav */
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  .glass-player {
+    /* Sleek player */
+    @apply bg-black/80 backdrop-blur-2xl border-t border-white/5;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .skeleton-shimmer {
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+}
