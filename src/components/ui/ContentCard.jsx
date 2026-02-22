@@ -24,10 +24,12 @@ export default function ContentCard({ item }) {
         if (playLoading || !user) return;
         setPlayLoading(true);
         try {
-            await Promise.all([
-                trackView(item.id),
-                upsertWatchHistory(item.id, user.uid, 0, item.duration || 120),
-            ]);
+            if (item.type?.toLowerCase() !== 'music') {
+                await Promise.all([
+                    trackView(item.id),
+                    upsertWatchHistory(item.id, user.uid, 0, item.duration || 120),
+                ]);
+            }
 
             // Route based on content type
             if (item.type?.toLowerCase() === 'music') {
@@ -83,6 +85,9 @@ export default function ContentCard({ item }) {
                     <h3 className="text-lg font-black text-white leading-tight mb-1 drop-shadow-md line-clamp-2">
                         {item.title}
                     </h3>
+                    {item.subtitle && (
+                        <p className="text-white/60 text-xs font-medium mb-1 truncate">{item.subtitle}</p>
+                    )}
 
                     <div className="flex items-center gap-2 mb-4">
                         <span className="flex items-center gap-1 text-xs text-yellow-400 font-bold">

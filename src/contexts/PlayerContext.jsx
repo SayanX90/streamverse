@@ -55,14 +55,18 @@ export function PlayerProvider({ children }) {
         setProgress(0);
     };
 
-    const togglePlay = () => {
+    const togglePlay = async () => {
         const audio = audioRef.current;
         if (isPlaying) {
             audio.pause();
             setIsPlaying(false);
         } else {
-            audio.play().catch(console.error);
-            setIsPlaying(true);
+            try {
+                await audio.play();
+                setIsPlaying(true);
+            } catch (err) {
+                console.error('[togglePlay] error:', err);
+            }
         }
     };
 

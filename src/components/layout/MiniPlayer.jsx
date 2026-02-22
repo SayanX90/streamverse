@@ -1,7 +1,7 @@
 import { Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, ListVideo } from 'lucide-react';
 import { usePlayer } from '../../contexts/PlayerContext';
 import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 
 export default function MiniPlayer() {
     const { currentTrack, isPlaying, progress, togglePlay, volume, changeVolume, seek } = usePlayer();
@@ -16,13 +16,36 @@ export default function MiniPlayer() {
         }
     }, [isMusicPage, isPlaying, togglePlay]);
 
+    const isDraggingVolume = useRef(false);
+    const [isHoveringVolume, setIsHoveringVolume] = useState(false);
+
+    const handleVolumeChange = useCallback((clientX, rect) => {
+        const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        changeVolume(x / rect.width);
+    }, [changeVolume]);
+
     // Hide player if nothing is playing OR if not on the music page
     if (!currentTrack || !isMusicPage) return null;
 
-    const handleVolume = (e) => {
+    const handleVolumeMouseDown = (e) => {
+        isDraggingVolume.current = true;
         const rect = e.currentTarget.getBoundingClientRect();
-        const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-        changeVolume(x / rect.width);
+        handleVolumeChange(e.clientX, rect);
+
+        const handleMouseMove = (moveEvent) => {
+            if (isDraggingVolume.current) {
+                handleVolumeChange(moveEvent.clientX, rect);
+            }
+        };
+
+        const handleMouseUp = () => {
+            isDraggingVolume.current = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
     };
 
     const handleSeek = (e) => {
@@ -83,15 +106,27 @@ export default function MiniPlayer() {
                 <button className="text-white/50 hover:text-white transition hidden md:block">
                     <ListVideo size={20} />
                 </button>
-                <div className="flex items-center gap-2 group hidden sm:flex">
-                    <Volume2 size={20} className="text-white/50 group-hover:text-white transition" />
+                <div
+                    className="flex items-center gap-2 group hidden sm:flex"
+                    onMouseEnter={() => setIsHoveringVolume(true)}
+                    onMouseLeave={() => setIsHoveringVolume(false)}
+                >
+                    <Volume2
+                        size={20}
+                        className={`transition-colors ${isHoveringVolume || isDraggingVolume.current ? 'text-white' : 'text-white/50'}`}
+                    />
                     <div
-                        className="w-20 h-1.5 bg-white/20 rounded relative cursor-pointer"
-                        onClick={handleVolume}
+                        className="w-24 h-1.5 bg-white/20 rounded-full relative cursor-pointer"
+                        onMouseDown={handleVolumeMouseDown}
                     >
                         <div
-                            className="absolute top-0 left-0 h-full bg-white rounded group-hover:bg-[#E50914] transition-colors pointer-events-none"
+                            className={`absolute top-0 left-0 h-full rounded-full transition-colors pointer-events-none ${isHoveringVolume || isDraggingVolume.current ? 'bg-[#E50914]' : 'bg-white'}`}
                             style={{ width: `${volume * 100}%` }}
+                        ></div>
+                        {/* Knob handle for smoother feel */}
+                        <div
+                            className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg transition-transform pointer-events-none ${isHoveringVolume || isDraggingVolume.current ? 'scale-110 opacity-100' : 'scale-0 opacity-0'}`}
+                            style={{ left: `calc(${volume * 100}% - 6px)` }}
                         ></div>
                     </div>
                 </div>

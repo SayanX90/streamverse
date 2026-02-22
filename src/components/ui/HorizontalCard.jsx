@@ -23,10 +23,12 @@ export default function HorizontalCard({ item, isContinueWatching = false }) {
             const duration = item.duration || 120;
             const progress = isContinueWatching ? item.progress : 0;
 
-            await Promise.all([
-                trackView(item.id),
-                upsertWatchHistory(item.id, user.uid, progress, duration)
-            ]);
+            if (item.type?.toLowerCase() !== 'music') {
+                await Promise.all([
+                    trackView(item.id),
+                    upsertWatchHistory(item.id, user.uid, progress, duration)
+                ]);
+            }
 
             if (item.type?.toLowerCase() === 'music') {
                 playTrack(item);
@@ -109,6 +111,7 @@ export default function HorizontalCard({ item, isContinueWatching = false }) {
 
                     <h3 className="text-xl md:text-2xl font-bold text-white leading-tight mb-2 drop-shadow-md">
                         {item.title}
+                        {item.subtitle && <span className="block text-sm font-medium text-white/60 mt-1">{item.subtitle}</span>}
                     </h3>
 
                     {/* Action Row */}

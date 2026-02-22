@@ -123,10 +123,6 @@ export default function VideoPlayer() {
             {/* Details Section for Mobile/Desktop */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-[#050505] hide-scrollbar">
                 <div className="max-w-4xl mx-auto">
-                    <h2 className="text-2xl sm:text-4xl font-black text-white mb-3 tracking-tight drop-shadow-md">
-                        {content?.title}
-                    </h2>
-
                     <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-white/50 mb-6 font-medium tracking-wide">
                         {content?.rating && (
                             <span className="text-accent border border-accent/20 bg-accent/10 px-2 py-0.5 rounded-sm font-bold">

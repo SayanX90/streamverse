@@ -44,6 +44,7 @@ export default function AuthPage() {
         try {
             await loginWithGoogle();
         } catch (err) {
+            console.error('[GoogleLogin]', err);
             setError(err.message.replace('Firebase: ', '').replace('Error (', '').replace(').', ''));
         } finally {
             setIsLoading(false);
@@ -51,7 +52,7 @@ export default function AuthPage() {
     };
 
     return (
-        <div className="fixed inset-0 bg-[#0F0F0F] flex items-center justify-center overflow-hidden font-sans">
+        <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center py-12 px-4 overflow-y-auto font-sans">
             {/* Background Decoration */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-accent/10 blur-[150px] animate-pulse" />
@@ -60,8 +61,8 @@ export default function AuthPage() {
 
             <div className="relative z-10 w-full max-w-[440px] px-6 animate-fade-in">
                 {/* Header */}
-                <div className="text-center mb-8">
-                    <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white mb-2">
+                <div className="text-center mb-6 md:mb-8">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-white mb-2">
                         STREAM<span className="text-accent underline decoration-accent/30 underline-offset-8">VERSE</span>
                     </h1>
                     <p className="text-white/50 text-base font-medium">
@@ -70,7 +71,7 @@ export default function AuthPage() {
                 </div>
 
                 {/* Auth Card */}
-                <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/50">
+                <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-2xl shadow-black/50">
                     <h2 className="text-2xl font-bold text-white mb-6">
                         {isLogin ? 'Welcome Back' : 'Join the Verse'}
                     </h2>

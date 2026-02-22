@@ -8,7 +8,7 @@ import { auth } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
     const {
         stats,
@@ -20,11 +20,19 @@ export default function Profile() {
 
     const [activeTab, setActiveTab] = useState('Watch History');
     const [loggingOut, setLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState(null); // State to hold logout error
 
     const handleLogout = async () => {
         setLoggingOut(true);
-        await signOut(auth);
-        navigate('/login');
+        setLogoutError(null); // Clear previous errors
+        try {
+            await logout(); // Use the logout function from AuthContext
+            navigate('/'); // Redirect to home page
+        } catch (error) {
+            console.error("Logout failed:", error);
+            setLogoutError("Failed to log out. Please try again."); // Set an error message
+            setLoggingOut(false); // Reset logging out state
+        }
     };
 
     if (loading) {

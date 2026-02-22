@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { discoverContent } from '../api/tmdb';
 import { discoverSports } from '../api/sports';
+import { fetchMusic } from '../services/musicApi';
 import { useContentContext } from '../contexts/ContentContext';
 
 export function usePaginatedContent(categoryType, filters, sortBy) {
@@ -32,6 +33,25 @@ export function usePaginatedContent(categoryType, filters, sortBy) {
                 results = sportsData.results;
                 totalCount = sportsData.totalCount;
                 totalPages = sportsData.totalPages;
+            } else if (categoryType === 'music') {
+                const langLabel = globalLanguage === 'hi' ? 'Hindi' : globalLanguage === 'bn' ? 'Bengali' : globalLanguage === 'en' ? 'English' : '';
+                const genreSearch = filters.genre !== 'All' ? filters.genre : (langLabel ? '' : 'top');
+                const finalSearch = [langLabel, genreSearch].filter(Boolean).join(' ') || 'top';
+
+                const musicData = await fetchMusic(finalSearch);
+                // Format iTunes results to match StreamVerse format
+                results = musicData.map(track => ({
+                    id: track.trackId.toString(),
+                    title: track.trackName,
+                    subtitle: track.artistName,
+                    thumbnail: track.artworkUrl100?.replace('100x100bb', '400x400bb') || track.artworkUrl100,
+                    year: track.releaseDate ? track.releaseDate.split('-')[0] : '',
+                    type: 'music',
+                    audioUrl: track.previewUrl,
+                    genre: track.primaryGenreName
+                }));
+                totalCount = results.length;
+                totalPages = 1; // iTunes search doesn't easily give total pages in this call
             } else {
                 const tmdbData = await discoverContent(categoryType, 1, filters, sortBy, globalLanguage);
                 results = tmdbData.results;
@@ -91,6 +111,10 @@ export function usePaginatedContent(categoryType, filters, sortBy) {
                 const sportsData = await discoverSports(nextPage);
                 results = sportsData.results;
                 totalPages = sportsData.totalPages;
+            } else if (categoryType === 'music') {
+                // No deep pagination for iTunes in this simple mock-like implementation
+                results = [];
+                totalPages = 1;
             } else {
                 const tmdbData = await discoverContent(categoryType, nextPage, filters, sortBy, globalLanguage);
                 results = tmdbData.results;

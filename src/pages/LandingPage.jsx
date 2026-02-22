@@ -37,8 +37,8 @@ export default function LandingPage() {
             </header>
 
             {/* Main Content Centered */}
-            <main className="relative z-20 flex-grow flex flex-col items-center justify-center text-center px-6 max-w-4xl mx-auto w-full -mt-20">
-                <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight tracking-tight mb-4 drop-shadow-2xl">
+            <main className="relative z-20 flex-grow flex flex-col items-center justify-center text-center px-6 max-w-4xl mx-auto w-full -mt-10 md:-mt-20">
+                <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight tracking-tight mb-4 drop-shadow-2xl">
                     Unlimited movies, TV <br className="hidden sm:block" />shows, and more
                 </h2>
                 {/* <p className="text-lg md:text-2xl text-white font-medium mb-8 drop-shadow-md">
