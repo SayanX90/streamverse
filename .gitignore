@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+.env.local
+build_err.log
+build_output.txt
+build.log
