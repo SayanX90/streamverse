@@ -59,7 +59,7 @@ export default function GlobalMusicPlayer() {
             </div>
 
             {/* Left Section: Track Metadata */}
-            <div className="flex items-center gap-3 md:gap-4 w-full md:w-1/3 min-w-0">
+            <div className="flex items-center gap-3 w-1/2 md:w-1/3 min-w-0 pr-4">
                 <div className="relative group flex-shrink-0">
                     <img
                         src={currentTrack.thumbnail}
@@ -78,24 +78,24 @@ export default function GlobalMusicPlayer() {
             </div>
 
             {/* Center Section: Main Controls */}
-            <div className="flex flex-col items-center gap-1 md:gap-2 absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 w-auto md:flex-grow md:max-w-[40%]">
+            <div className="flex flex-col items-center gap-1 md:gap-2 flex-grow md:max-w-[40%]">
                 <div className="flex items-center gap-4 md:gap-10">
                     <button className="text-white/40 hover:text-white transition hidden md:block"><Shuffle size={18} /></button>
                     <button
                         onClick={playPrev}
                         className="text-white/60 hover:text-white transition transform active:scale-90 hidden sm:block"
                     >
-                        <SkipBack size={window.innerWidth < 768 ? 20 : 24} fill="currentColor" />
+                        <SkipBack size={24} fill="currentColor" />
                     </button>
 
                     <button
                         onClick={togglePlay}
-                        className="w-10 h-10 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+                        className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-[0_0_30px_rgba(255,255,255,0.2)]"
                     >
                         {isPlaying ? (
-                            <Pause size={window.innerWidth < 768 ? 20 : 24} className="text-black fill-black" />
+                            <Pause size={24} className="text-black fill-black" />
                         ) : (
-                            <Play size={window.innerWidth < 768 ? 20 : 24} className="text-black fill-black ml-1" />
+                            <Play size={24} className="text-black fill-black ml-1" />
                         )}
                     </button>
 
@@ -103,7 +103,7 @@ export default function GlobalMusicPlayer() {
                         onClick={playNext}
                         className="text-white/60 hover:text-white transition transform active:scale-90"
                     >
-                        <SkipForward size={window.innerWidth < 768 ? 20 : 24} fill="currentColor" />
+                        <SkipForward size={24} fill="currentColor" />
                     </button>
                     <button className="text-white/40 hover:text-white transition hidden md:block"><Repeat size={18} /></button>
                 </div>

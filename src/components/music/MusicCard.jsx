@@ -24,11 +24,11 @@ export default function MusicCard({ track }) {
 
             {/* Play/Pause Button Overlay */}
             <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${isThisPlaying ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'}`}>
-                <div className={`w-10 h-10 md:w-16 md:h-16 bg-accent rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(229,9,20,0.6)] transform transition-transform duration-300 ${isThisPlaying ? 'scale-100' : 'scale-75 md:group-hover:scale-100'}`}>
+                <div className={`w-12 h-12 md:w-16 md:h-16 bg-accent rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(229,9,20,0.6)] transform transition-transform duration-300 ${isThisPlaying ? 'scale-100' : 'scale-75 md:group-hover:scale-100'}`}>
                     {isThisPlaying ? (
-                        <Pause size={window.innerWidth < 768 ? 20 : 28} className="text-white fill-white" />
+                        <Pause size={24} className="text-white fill-white md:w-7 md:h-7" />
                     ) : (
-                        <Play size={window.innerWidth < 768 ? 20 : 28} className="text-white fill-white ml-0.5 md:ml-1" />
+                        <Play size={24} className="text-white fill-white ml-0.5 md:ml-1 md:w-7 md:h-7" />
                     )}
                 </div>
             </div>
