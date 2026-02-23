@@ -157,15 +157,41 @@ export const fetchMovieTrailer = async (movieId) => {
 };
 
 /**
- * Fetch Details for a specific Movie including trailer
- * endpoint: /movie/{movie_id}
+ * Fetch Details for a specific Movie or TV Series including trailers/videos
+ * endpoint: /movie/{id} or /tv/{id}
  */
-export const fetchDetails = async (movieId) => {
+export const fetchDetails = async (id, type = null) => {
     try {
-        const response = await tmdbApi.get(`/movie/${movieId}`, {
-            params: { append_to_response: 'videos' }
-        });
-        const data = response.data;
+        // If type is explicitly 'series' or 'tv', use /tv, otherwise default to /movie
+        let endpoints = [];
+        if (type === 'series' || type === 'tv') {
+            endpoints = [`/tv/${id}`];
+        } else if (type === 'movie') {
+            endpoints = [`/movie/${id}`];
+        } else {
+            // If unknown, try movie first, then tv
+            endpoints = [`/movie/${id}`, `/tv/${id}`];
+        }
+
+        let data = null;
+        let finalType = type;
+
+        for (const endpoint of endpoints) {
+            try {
+                const response = await tmdbApi.get(endpoint, {
+                    params: { append_to_response: 'videos' }
+                });
+                data = response.data;
+                if (endpoint.includes('/tv/')) finalType = 'series';
+                else if (endpoint.includes('/movie/')) finalType = 'movie';
+                break;
+            } catch (e) {
+                // Continue to next endpoint if failed
+                continue;
+            }
+        }
+
+        if (!data) return null;
 
         let videoUrl = null;
         if (data.videos && data.videos.results) {
@@ -178,17 +204,22 @@ export const fetchDetails = async (movieId) => {
             }
         }
 
-        const formatted = formatMovieData(data);
+        const formatted = formatMovieData({ ...data, media_type: finalType === 'series' ? 'tv' : 'movie' });
         return {
             ...formatted,
             videoUrl,
-            runtime: data.runtime ? `${Math.floor(data.runtime / 60)}h ${data.runtime % 60}m` : '120m',
+            runtime: data.runtime
+                ? `${Math.floor(data.runtime / 60)}h ${data.runtime % 60}m`
+                : (data.episode_run_time ? `${data.episode_run_time[0]}m` : '45m'),
+            releaseDate: data.release_date || data.first_air_date,
+            genres: data.genres ? data.genres.map(g => g.name) : []
         };
     } catch (error) {
-        console.error(`Error fetching details for movie ${movieId}:`, error);
+        console.error(`Error fetching details for ${id}:`, error);
         return null;
     }
 };
+
 
 /**
  * Discover Content (Movies or TV) with advanced filtering and pagination
@@ -215,9 +246,14 @@ export const discoverContent = async (categoryType = 'movie', page = 1, filters 
         };
 
         if (language && language !== 'All') {
-            params.with_original_language = language;
-            if (['hi', 'bn'].includes(language)) {
-                params.region = 'IN'; // Ensure accurate regional results for Indian languages
+            if (language === 'Mixed') {
+                params.with_original_language = 'en|hi|bn';
+                params.region = 'IN';
+            } else {
+                params.with_original_language = language;
+                if (['hi', 'bn'].includes(language)) {
+                    params.region = 'IN'; // Ensure accurate regional results for Indian languages
+                }
             }
         }
 
@@ -226,6 +262,9 @@ export const discoverContent = async (categoryType = 'movie', page = 1, filters 
             params.with_genres = '10402'; // TMDB Movie Genre ID for Music
         } else if (categoryType === 'sports') {
             params.with_keywords = '6075'; // TMDB Keyword ID for Sport
+        } else if (categoryType === 'series') {
+            params.without_genres = '10766,10764'; // Exclude Soap Operas and Reality TV
+            params['vote_count.gte'] = 20; // Filter out daily soaps with very few votes
         }
 
         // Map local genre names to TMDB genre IDs
@@ -233,7 +272,11 @@ export const discoverContent = async (categoryType = 'movie', page = 1, filters 
             'Action': 28, 'Adventure': 12, 'Animation': 16, 'Comedy': 35, 'Crime': 80,
             'Documentary': 99, 'Drama': 18, 'Family': 10751, 'Fantasy': 14, 'History': 36,
             'Horror': 27, 'Music': 10402, 'Mystery': 9648, 'Romance': 10749, 'Science Fiction': 878, 'Sci-Fi': 878,
-            'TV Movie': 10770, 'Thriller': 53, 'War': 10752, 'Western': 37
+            'TV Movie': 10770, 'Thriller': 53, 'War': 10752, 'Western': 37,
+            // TV Specific
+            'Action & Adventure': 10759,
+            'Sci-Fi & Fantasy': 10765,
+            'War & Politics': 10768
         };
 
         if (filters.genre && filters.genre !== 'All' && genreMap[filters.genre]) {

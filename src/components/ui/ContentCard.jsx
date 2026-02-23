@@ -5,7 +5,6 @@ import { useLike } from '../../hooks/useLike';
 import useMyList from '../../hooks/useMyList';
 import { trackView, upsertWatchHistory } from '../../lib/firestoreService';
 import { useAuth } from '../../contexts/AuthContext';
-import { usePlayer } from '../../contexts/PlayerContext';
 
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1616530940355-351fabd9524b?w=400&q=80";
 
@@ -15,7 +14,6 @@ export default function ContentCard({ item }) {
 
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { playTrack } = usePlayer();
     const { liked, likeLoading, handleToggleLike } = useLike(item.id);
     const { inList, handleToggleList, loading: listLoading } = useMyList(item.id);
 
@@ -24,24 +22,15 @@ export default function ContentCard({ item }) {
         if (playLoading || !user) return;
         setPlayLoading(true);
         try {
-            if (item.type?.toLowerCase() !== 'music') {
-                await Promise.all([
-                    trackView(item.id),
-                    upsertWatchHistory(item.id, user.uid, 0, item.duration || 120),
-                ]);
-            }
+            await Promise.all([
+                trackView(item.id),
+                upsertWatchHistory(item.id, user.uid, 0, item.duration || 120),
+            ]);
 
-            // Route based on content type
-            if (item.type?.toLowerCase() === 'music') {
-                playTrack(item);
-            } else {
-                navigate(`/watch/${item.id}`);
-            }
+            navigate(`/watch/${item.id}`, { state: { type: item.type } });
         } catch (err) {
             console.error('[ContentCard] handlePlay error:', err);
-            if (item.type?.toLowerCase() !== 'music') {
-                navigate(`/watch/${item.id}`);
-            }
+            navigate(`/watch/${item.id}`, { state: { type: item.type } });
         } finally {
             setPlayLoading(false);
         }

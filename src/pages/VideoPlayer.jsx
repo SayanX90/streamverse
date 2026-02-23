@@ -27,7 +27,7 @@ export default function VideoPlayer() {
                 if (type === 'sports') {
                     data = await fetchSportsDetails(id);
                 } else {
-                    data = await fetchDetails(id);
+                    data = await fetchDetails(id, type);
                 }
 
                 if (data) {

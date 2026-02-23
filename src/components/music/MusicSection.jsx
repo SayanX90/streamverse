@@ -1,50 +1,66 @@
-import { useEffect, useState, useRef } from "react";
-import { fetchMusic } from "../../services/musicApi";
-import { usePlayer } from "../../contexts/PlayerContext";
-import { Play, Pause, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { fetchMusicSection } from '../../services/musicService';
+import MusicCard from './MusicCard';
 
-export default function MusicSection({ title, searchTerm }) {
+export default function MusicSection({ title, displayTitle, language = 'All' }) {
     const [tracks, setTracks] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { playTrack, currentTrack, isPlaying } = usePlayer();
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
     const scrollRef = useRef(null);
 
     useEffect(() => {
-        const loadMusic = async () => {
+        const loadInitial = async () => {
             setLoading(true);
-            const data = await fetchMusic(searchTerm);
-            setTracks(data || []);
+            setPage(1); // Reset page on language change
+            const data = await fetchMusicSection(title, 1, 20, language);
+            setTracks(data.tracks);
+            setHasMore(data.hasMore);
             setLoading(false);
         };
-        loadMusic();
-    }, [searchTerm]);
+        loadInitial();
+    }, [title, language]);
 
-    const handlePlay = (track) => {
-        playTrack({
-            id: track.trackId,
-            title: track.trackName,
-            subtitle: track.artistName,
-            image: track.artworkUrl100?.replace('100x100bb', '300x300bb') || track.artworkUrl100, // Higher res image if possible
-            audioUrl: track.previewUrl
-        });
+    const handleScroll = async () => {
+        if (!scrollRef.current || loadingMore || !hasMore) return;
+
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        const isNearEnd = scrollWidth - (scrollLeft + clientWidth) < 500;
+
+        if (isNearEnd) {
+            setLoadingMore(true);
+            const nextPage = page + 1;
+            const data = await fetchMusicSection(title, nextPage, 20, language);
+
+            setTracks(prev => {
+                const existingIds = new Set(prev.map(t => t.id));
+                const newTracks = data.tracks.filter(t => !existingIds.has(t.id));
+                return [...prev, ...newTracks];
+            });
+
+            setPage(nextPage);
+            setHasMore(data.hasMore);
+            setLoadingMore(false);
+        }
     };
 
     const scroll = (direction) => {
         if (scrollRef.current) {
-            const { current } = scrollRef;
-            const scrollAmount = direction === 'left' ? -current.clientWidth : current.clientWidth;
-            current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            const scrollAmount = direction === 'left' ? -800 : 800;
+            scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
     };
 
-    if (loading) {
+    if (loading && page === 1) {
         return (
-            <div className="py-4">
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-4 px-6 md:px-12 flex items-center gap-2">
-                    {title}
-                </h2>
-                <div className="flex items-center justify-center h-48">
-                    <Loader2 size={32} className="animate-spin text-white/40" />
+            <div className="py-8 animate-pulse">
+                <div className="h-8 w-48 bg-white/5 rounded mx-6 md:px-12 mb-6"></div>
+                <div className="flex gap-4 px-6 md:px-12">
+                    {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="flex-none w-[180px] md:w-[220px] aspect-square bg-white/5 rounded-xl"></div>
+                    ))}
                 </div>
             </div>
         );
@@ -53,72 +69,41 @@ export default function MusicSection({ title, searchTerm }) {
     if (tracks.length === 0) return null;
 
     return (
-        <div className="py-4 group/section relative">
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-4 px-6 md:px-12 flex items-center gap-2">
-                {title}
+        <div className="py-4 md:py-8 group/section relative">
+            <h2 className="text-xl md:text-3xl font-black text-white mb-4 md:mb-6 px-4 md:px-12 flex items-center gap-3">
+                {displayTitle || title}
+                <ChevronRight className="text-accent opacity-0 group-hover/section:opacity-100 transition-opacity hidden md:block" />
             </h2>
 
-            {/* Scroll Buttons */}
+            {/* Navigation Buttons - Desktop Only */}
             <button
                 onClick={() => scroll('left')}
-                className="absolute left-0 top-0 bottom-0 z-40 w-12 flex items-center justify-center bg-black/60 opacity-0 group-hover/section:opacity-100 transition-opacity hover:bg-black/80"
+                className="absolute left-0 top-[60%] -translate-y-1/2 z-40 w-14 h-24 hidden md:flex items-center justify-center bg-black/60 backdrop-blur-md border-r border-white/10 opacity-0 group-hover/section:opacity-100 transition-all hover:bg-black/90 text-white rounded-r-xl"
             >
-                <ChevronLeft size={36} className="text-white drop-shadow-md" />
+                <ChevronLeft size={40} />
             </button>
             <button
                 onClick={() => scroll('right')}
-                className="absolute right-0 top-0 bottom-0 z-40 w-12 flex items-center justify-center bg-black/60 opacity-0 group-hover/section:opacity-100 transition-opacity hover:bg-black/80"
+                className="absolute right-0 top-[60%] -translate-y-1/2 z-40 w-14 h-24 hidden md:flex items-center justify-center bg-black/60 backdrop-blur-md border-l border-white/10 opacity-0 group-hover/section:opacity-100 transition-all hover:bg-black/90 text-white rounded-l-xl"
             >
-                <ChevronRight size={36} className="text-white drop-shadow-md" />
+                <ChevronRight size={40} />
             </button>
 
-            {/* Scroll Container */}
+            {/* Horizontal Scroll Container */}
             <div
                 ref={scrollRef}
-                className="flex gap-4 overflow-x-auto scrollbar-hide px-6 md:px-12 pb-4 snap-x"
+                onScroll={handleScroll}
+                className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide px-4 md:px-12 pb-4 md:pb-8 snap-x"
             >
-                {tracks.map((track) => {
-                    const isTrackPlaying = currentTrack?.id === track.trackId && isPlaying;
+                {tracks.map((track) => (
+                    <MusicCard key={track.id} track={track} />
+                ))}
 
-                    return (
-                        <div
-                            key={track.trackId}
-                            className="relative flex-none w-[180px] md:w-[220px] aspect-square rounded-lg overflow-hidden snap-start group cursor-pointer border border-white/5 transition-transform duration-300 hover:scale-105 hover:z-10 hover:shadow-2xl hover:border-white/20"
-                            onClick={() => handlePlay(track)}
-                        >
-                            {/* Artwork */}
-                            <img
-                                src={track.artworkUrl100?.replace('100x100bb', '300x300bb') || track.artworkUrl100}
-                                alt={track.trackName}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-
-                            {/* Gradient Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-
-                            {/* Play Overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                                <div className="w-14 h-14 bg-accent rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(229,9,20,0.5)] transform scale-75 group-hover:scale-100 transition-transform duration-300">
-                                    {isTrackPlaying ? (
-                                        <Pause size={28} className="text-white fill-white" />
-                                    ) : (
-                                        <Play size={28} className="text-white fill-white ml-1" />
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Info */}
-                            <div className="absolute bottom-0 left-0 right-0 p-4">
-                                <h3 className="text-white font-bold text-base line-clamp-1 drop-shadow-md">
-                                    {track.trackName}
-                                </h3>
-                                <p className="text-white/60 text-xs truncate mt-1">
-                                    {track.artistName}
-                                </p>
-                            </div>
-                        </div>
-                    );
-                })}
+                {loadingMore && (
+                    <div className="flex-none w-[180px] md:w-[220px] aspect-square flex items-center justify-center bg-white/5 rounded-xl border border-dashed border-white/10">
+                        <Loader2 className="animate-spin text-accent" size={32} />
+                    </div>
+                )}
             </div>
         </div>
     );

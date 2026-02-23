@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useContentContext } from '../../contexts/ContentContext';
 import { usePaginatedContent } from '../../hooks/usePaginatedContent';
 import FilterBar from '../ui/FilterBar';
@@ -6,7 +7,13 @@ import ContentGrid from './ContentGrid';
 import { ExternalLink } from 'lucide-react';
 
 export default function CategoryPageLayout({ type, title, description, heroImage }) {
-    const { globalFilters, globalSort } = useContentContext();
+    const { globalFilters, globalSort, resetFilters } = useContentContext();
+
+    // Reset filters when switching categories (e.g. Movie -> Series)
+    // This prevents "Sports" genres from staying active on the Series page
+    useEffect(() => {
+        resetFilters();
+    }, [type]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const { data, totalCount, loading, loadingMore, hasMore, loadMore, error, errorIndexLink } = usePaginatedContent(
         type,

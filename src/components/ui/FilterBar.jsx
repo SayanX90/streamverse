@@ -7,8 +7,8 @@ const ALL_GENRES = ['All', 'Action', 'Sci-Fi', 'Drama', 'Comedy', 'Thriller', 'H
     'Pop', 'Rock', 'Hip Hop', 'Classical', 'Jazz', 'Electronic', 'Documentary'];
 
 const genresByType = {
-    movie: ALL_GENRES,
-    series: ALL_GENRES,
+    movie: ['All', 'Action', 'Sci-Fi', 'Drama', 'Comedy', 'Thriller', 'Horror', 'Romance', 'Adventure', 'Fantasy', 'Animation', 'Documentary'],
+    series: ['All', 'Action & Adventure', 'Sci-Fi & Fantasy', 'Drama', 'Comedy', 'Crime', 'Mystery', 'Animation', 'Documentary', 'Reality', 'War & Politics'],
     sports: ['All', 'Football', 'Basketball', 'Tennis', 'Formula 1', 'Cricket', 'UFC'],
     music: ['All', 'Pop', 'Rock', 'Hip Hop', 'Classical', 'Jazz', 'Electronic'],
 };

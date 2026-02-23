@@ -1,7 +1,7 @@
 import { useParams, Navigate } from 'react-router-dom';
 import CategoryPageLayout from '../components/layout/CategoryPageLayout';
 
-const validTypes = ['movie', 'series', 'sports', 'music'];
+const validTypes = ['movie', 'series', 'sports'];
 
 const categoryInfo = {
     movie: {
@@ -18,11 +18,6 @@ const categoryInfo = {
         title: "Sports",
         description: "Feel the adrenaline. Catch all the live action, highlights, and legendary moments.",
         heroImage: "https://image.tmdb.org/t/p/original/2vq5GTJOahE03mNYZGxIynlHcWr.jpg" // Ford v Ferrari
-    },
-    music: {
-        title: "Music",
-        description: "Turn up the volume. Unlimited access to the world's best concerts, music videos, and documentaries.",
-        heroImage: "https://image.tmdb.org/t/p/original/dcvbs8z0GEXslC1kCT77x19XDeR.jpg" // Bohemian Rhapsody
     }
 };
 

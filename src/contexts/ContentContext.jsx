@@ -23,7 +23,7 @@ export function ContentProvider({ children }) {
         setGlobalLanguage('All');
     };
 
-    const value = {
+    const value = React.useMemo(() => ({
         globalFilters,
         setGlobalFilters,
         globalSort,
@@ -31,7 +31,7 @@ export function ContentProvider({ children }) {
         globalLanguage,
         setGlobalLanguage,
         resetFilters
-    };
+    }), [globalFilters, globalSort, globalLanguage]);
 
     return (
         <ContentContext.Provider value={value}>

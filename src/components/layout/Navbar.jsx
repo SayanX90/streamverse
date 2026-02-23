@@ -21,6 +21,7 @@ export default function Navbar() {
         { code: 'hi', label: 'Hindi' },
         { code: 'bn', label: 'Bengali' },
         { code: 'en', label: 'English' },
+        { code: 'Mixed', label: 'Mixed' },
     ];
 
     useEffect(() => {

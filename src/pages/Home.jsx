@@ -1,7 +1,6 @@
 import HeroBanner from '../components/home/HeroBanner';
 import ExpandableCarousel from '../components/ui/ExpandableCarousel';
 import ListCarousel from '../components/ui/ListCarousel';
-import MusicSection from '../components/music/MusicSection';
 import useProfileData from '../hooks/useProfileData';
 import { useAuth } from '../contexts/AuthContext';
 import { useContentContext } from '../contexts/ContentContext';
@@ -82,11 +81,6 @@ export default function Home() {
                     title="More Trending"
                     items={trending.slice(6, 20)}
                 />
-
-                {/* Music Rows */}
-                <MusicSection title="Top Bollywood Music" searchTerm="bollywood" />
-                <MusicSection title="Top Bengali Music" searchTerm="bengali" />
-                <MusicSection title="Top English Music" searchTerm="english" />
 
             </div>
         </div>

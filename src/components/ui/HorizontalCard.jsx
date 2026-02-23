@@ -5,12 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { trackView, upsertWatchHistory } from '../../lib/firestoreService';
 import useMyList from '../../hooks/useMyList';
 import { useState } from 'react';
-import { usePlayer } from '../../contexts/PlayerContext';
 
 export default function HorizontalCard({ item, isContinueWatching = false }) {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { playTrack } = usePlayer();
     const { inList, handleToggleList, loading: listLoading } = useMyList(item.id);
     const [playLoading, setPlayLoading] = useState(false);
 
@@ -23,23 +21,15 @@ export default function HorizontalCard({ item, isContinueWatching = false }) {
             const duration = item.duration || 120;
             const progress = isContinueWatching ? item.progress : 0;
 
-            if (item.type?.toLowerCase() !== 'music') {
-                await Promise.all([
-                    trackView(item.id),
-                    upsertWatchHistory(item.id, user.uid, progress, duration)
-                ]);
-            }
+            await Promise.all([
+                trackView(item.id),
+                upsertWatchHistory(item.id, user.uid, progress, duration)
+            ]);
 
-            if (item.type?.toLowerCase() === 'music') {
-                playTrack(item);
-            } else {
-                navigate(`/watch/${item.id}`);
-            }
+            navigate(`/watch/${item.id}`);
         } catch (err) {
             console.error('[HorizontalCard] handlePlay error:', err);
-            if (item.type?.toLowerCase() !== 'music') {
-                navigate(`/watch/${item.id}`);
-            }
+            navigate(`/watch/${item.id}`);
         } finally {
             setPlayLoading(false);
         }

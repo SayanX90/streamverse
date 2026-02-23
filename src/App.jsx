@@ -9,12 +9,13 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Cookie from './pages/Cookie';
 import VideoPlayer from './pages/VideoPlayer';
+import MusicPage from './pages/MusicPage';
 import { ContentProvider } from './contexts/ContentContext';
-import { PlayerProvider } from './contexts/PlayerContext';
+import { MusicProvider } from './contexts/MusicContext';
 
 function App() {
     return (
-        <PlayerProvider>
+        <MusicProvider>
             <ContentProvider>
                 <Routes>
                     {/* Video player — fullscreen, no Layout (no Navbar/Footer/MiniPlayer) */}
@@ -23,6 +24,7 @@ function App() {
                     {/* Main Layout wrapper */}
                     <Route path="/" element={<Layout />}>
                         <Route index element={<Home />} />
+                        <Route path="category/music" element={<MusicPage />} />
                         <Route path="category/:type" element={<Category />} />
                         <Route path="search" element={<Search />} />
                         <Route path="profile" element={<Profile />} />
@@ -33,7 +35,7 @@ function App() {
                     </Route>
                 </Routes>
             </ContentProvider>
-        </PlayerProvider>
+        </MusicProvider>
     );
 }
 
