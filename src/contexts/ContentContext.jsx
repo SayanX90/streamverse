@@ -20,7 +20,6 @@ export function ContentProvider({ children }) {
             releaseYearRange: null,
         });
         setGlobalSort('popularity-desc');
-        setGlobalLanguage('All');
     };
 
     const value = React.useMemo(() => ({
