@@ -59,7 +59,7 @@ export default function GlobalMusicPlayer() {
             </div>
 
             {/* Left Section: Track Metadata */}
-            <div className="flex items-center gap-3 w-1/2 md:w-1/3 min-w-0 pr-4">
+            <div className="flex items-center gap-3 flex-1 min-w-0 md:w-1/3 pr-4">
                 <div className="relative group flex-shrink-0">
                     <img
                         src={currentTrack.thumbnail}
@@ -67,7 +67,7 @@ export default function GlobalMusicPlayer() {
                         className="w-12 h-12 md:w-16 md:h-16 rounded-lg object-cover border border-white/10 shadow-lg"
                     />
                 </div>
-                <div className="min-w-0">
+                <div className="flex-1 min-w-0 overflow-hidden">
                     <h4 className="text-white font-bold text-xs md:text-base truncate leading-tight">
                         {currentTrack.title}
                     </h4>
@@ -78,7 +78,7 @@ export default function GlobalMusicPlayer() {
             </div>
 
             {/* Center Section: Main Controls */}
-            <div className="flex flex-col items-center gap-1 md:gap-2 flex-grow md:max-w-[40%]">
+            <div className="flex flex-col items-center gap-1 md:gap-2 flex-shrink-0 ml-auto md:ml-0 md:flex-grow md:max-w-[40%]">
                 <div className="flex items-center gap-4 md:gap-10">
                     <button className="text-white/40 hover:text-white transition hidden md:block"><Shuffle size={18} /></button>
                     <button

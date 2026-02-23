@@ -93,6 +93,23 @@ export const fetchMusicSection = async (sectionName, page = 1, limit = 20, langu
 };
 
 /**
+ * Searches for music tracks using the iTunes API
+ */
+export const searchMusic = async (query, limit = 20) => {
+    if (!query) return [];
+    try {
+        // We try to search globally first, but can adjust if needed
+        const response = await axios.get(
+            `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=${limit}&media=music&lang=en_us`
+        );
+        return (response.data.results || []).map(formatTrack);
+    } catch (error) {
+        console.error("Error searching music:", error);
+        return [];
+    }
+};
+
+/**
  * Dynamically gets a list of sections for vertical infinite scroll
  */
 export const getAvailableSections = () => Object.keys(SECTION_KEYWORDS);

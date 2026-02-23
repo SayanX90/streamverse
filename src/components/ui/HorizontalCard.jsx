@@ -3,6 +3,7 @@ import { cn } from '../layout/Navbar';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { trackView, upsertWatchHistory } from '../../lib/firestoreService';
+import { useMusic } from '../../contexts/MusicContext';
 import useMyList from '../../hooks/useMyList';
 import { useState } from 'react';
 
@@ -10,12 +11,19 @@ export default function HorizontalCard({ item, isContinueWatching = false }) {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { inList, handleToggleList, loading: listLoading } = useMyList(item.id);
+    const { playTrack } = useMusic();
     const [playLoading, setPlayLoading] = useState(false);
 
     const handlePlay = async (e) => {
         if (e) e.stopPropagation();
-        if (!user || playLoading) return;
 
+        // Music specific play logic
+        if (item.type === 'music') {
+            playTrack(item);
+            return;
+        }
+
+        if (!user || playLoading) return;
         setPlayLoading(true);
         try {
             const duration = item.duration || 120;
@@ -60,13 +68,11 @@ export default function HorizontalCard({ item, isContinueWatching = false }) {
                         <div className="flex items-center gap-3 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                             {item.type === 'sports' ? (
                                 <div className="flex items-center gap-3 w-full bg-black/40 backdrop-blur-md px-3 py-1.5 border border-white/10 rounded-sm">
-                                    {/* Home Team */}
+                                    {/* ... existing sports logic ... */}
                                     <div className="flex items-center gap-2">
                                         {item.homeBadge && <img src={item.homeBadge} alt={item.homeTeam} className="w-5 h-5 object-contain" />}
                                         <span className="text-white font-bold text-xs truncate max-w-[80px] hidden md:block">{item.homeTeam}</span>
                                     </div>
-
-                                    {/* VS / Score Element */}
                                     <div className="flex items-center gap-1">
                                         {item.status === 'Match Finished' ? (
                                             <span className="bg-accent/20 text-accent font-black text-xs px-2 py-0.5 rounded-sm whitespace-nowrap">
@@ -76,18 +82,22 @@ export default function HorizontalCard({ item, isContinueWatching = false }) {
                                             <span className="text-white/40 font-bold text-[10px] px-1 italic">VS</span>
                                         )}
                                     </div>
-
-                                    {/* Away Team */}
                                     <div className="flex items-center gap-2">
                                         <span className="text-white font-bold text-xs truncate max-w-[80px] hidden md:block">{item.awayTeam}</span>
                                         {item.awayBadge && <img src={item.awayBadge} alt={item.awayTeam} className="w-5 h-5 object-contain" />}
                                     </div>
-
                                     <div className="ml-auto w-1 h-1 bg-white/20 rounded-full mx-1 hidden sm:block"></div>
                                     <span className="text-white/60 text-[10px] font-medium tracking-wide whitespace-nowrap hidden sm:block">
                                         {item.matchDate ? item.matchDate : 'TBA'}
                                     </span>
                                 </div>
+                            ) : item.type === 'music' ? (
+                                <>
+                                    <span className="text-[10px] font-black tracking-widest px-2 py-0.5 bg-accent text-white uppercase backdrop-blur-sm">SONG</span>
+                                    <span className="text-xs text-white/50 uppercase tracking-widest">{item.genre || 'Music'}</span>
+                                    <span className="w-1 h-1 bg-white/20 rounded-full"></span>
+                                    <span className="text-xs text-accent font-bold">{item.year}</span>
+                                </>
                             ) : (
                                 <>
                                     <span className="text-[10px] font-black tracking-widest px-2 py-0.5 border border-white/20 text-white uppercase backdrop-blur-sm">{item.match || '4K HDR'}</span>

@@ -111,6 +111,26 @@ export const fetchTopBollywood = async () => {
 };
 
 /**
+ * Search Movies and TV Series simultaneously
+ * endpoint: /search/multi
+ */
+export const searchMulti = async (query) => {
+    if (!query) return [];
+    try {
+        const response = await tmdbApi.get(`/search/multi`, {
+            params: { query, include_adult: false }
+        });
+        // Filter for only movies and tv, and format
+        return response.data.results
+            .filter(item => item.media_type === 'movie' || item.media_type === 'tv')
+            .map(formatMovieData);
+    } catch (error) {
+        console.error("Error searching multi:", error);
+        return [];
+    }
+};
+
+/**
  * Search Movies
  * endpoint: /search/movie
  */
